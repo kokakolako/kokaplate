@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# get the name of the project directory
+if [ $1=="[a-zA-Z0-9]*" ];
+	then
+		project_name=$1
+	else
+		echo "Wie willst du dein neues Projekt benennen? "
+		read project_name
+fi
+
+# create the project directory
+mkdir $project_name
+cd $project_name
+
+# create the default files (style.css + functions.js) and directorys
+mkdir css lib js img
+touch css/style.css js/functions.js
+echo "Der Projekt Ordner \"$project_name\" wurde erfolgreich erstellt"
+
+# installation of bootstrap, modernizr, jquery
+bower install bootstrap modernizr jquery
+
+# compilation of the bootstrap stylesheets
+lessc lib/bootstrap/less/bootstrap.less > css/bootstrap.css
+echo "Bootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt"
+
+# customize the index.html
+cat index.html | pyp "p.replace('[[project_name]]', $project_name)" > index.tmp
+rm index.html
+mv index.tmp index.html
+
+# initialize git
+git init
+git add .
+git commit -m "initial commit"
+
+# --------------------------------------------------------------------
+# uncommentate the following stuff when you want to use also angular-js
+# --------------------------------------------------------------------
+
+# echo "Möchtest du auch AngularJS deinem Projekt hinzufügen? [Ja/Nein] "
+# read YESNO
+# if [ "$YESNO"=="[jJ][aA]" ] || [ "$YESNO"=="[jJ]" ];
+# 	then
+# 		cp ~/Projekte/kokaplate/lib/index-angular.html .
+# 		mv index-angular.html index.html
+# 		bower install angular
+# 		mv components/* lib
+# 		rm -r components/
+# 		echo "AngularJS wurde erfolgreich deinem Projekt hinzugefügt"
+# 	else
+# 		echo "AngularJS wurde nicht deinem Projekt hinzugefügt"
+# 		cp ~/Projekte/kokaplate/lib/index.html .
+# fi
