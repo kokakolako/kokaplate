@@ -26,9 +26,7 @@ lessc lib/bootstrap/less/bootstrap.less > css/bootstrap.css
 echo "Bootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt"
 
 # customize the index.html
-cat index.html | pyp "p.replace('[[project_name]]', $project_name)" > index.tmp
-rm index.html
-mv index.tmp index.html
+cat ~/Projekte/kokaplate/index.html | pyp "p.replace('[[project_name]]', $project_name)" > index.html
 
 # initialize git
 git init
