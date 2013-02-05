@@ -1,21 +1,21 @@
 #!/bin/sh
 
 # get the name of the project directory
-if [ $1=="[a-zA-Z0-9]*" ];
+if [ -z $1 ];
 	then
-		project_name=$1
-	else
 		echo "Wie willst du dein neues Projekt benennen? "
 		read project_name
+	else
+		project_name=$1
 fi
 
 # create the project directory
-mkdir $project_name
+sudo mkdir $project_name
 cd $project_name
 
 # create the default files (style.css + functions.js) and directorys
-mkdir css lib js img
-touch css/style.css js/functions.js
+sudo mkdir css lib js img
+sudo touch css/style.css js/functions.js
 echo "Der Projekt Ordner \"$project_name\" wurde erfolgreich erstellt"
 
 # installation of bootstrap, modernizr, jquery
@@ -26,7 +26,7 @@ lessc lib/bootstrap/less/bootstrap.less > css/bootstrap.css
 echo "Bootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt"
 
 # customize the index.html
-cat /opt/kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', $project_name)" > index.html
+cat /opt/kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', '$project_name')" > index.html
 
 # initialize git
 git init
