@@ -1,17 +1,29 @@
 #!/bin/sh
 
+# check the dependencies
+
+command -v bower >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten\033[0m: Bitte installiere dir Bower um kokaplate ausführen zu können.\nUm Bower zu installieren ist es zunächst notwendig Node.js zu installieren. Node.js lässt sich von folgender Webseite herunterladen: \"http://nodejs.org/\". Nach der Installation von Node.js lässt sich Bower mittels folgenden Befehl installieren: sudo npm install -g bower"; 
+    exit 1; 
+}
+
+command -v pyp >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Pyp ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Pyp nun automatisch heruntergeladen und installiert."
+    sudo wget -O /opt/kokaplate/pyp https://pyp.googlecode.com/files/pyp_beta
+    sudo ln -s /opt/kokaplate/pyp /bin/pyp
+}
+
 # get the name of the project directory
-if [ -z $1 ];
-	then
-		echo "Wie willst du dein neues Projekt benennen? "
-		read project_name
-	else
-		project_name=$1
+if [ -z $1 ]; then
+    echo "\033[0;32mWie willst du dein neues Projekt benennen?\033[0m "
+    read project_name
+else
+    project_name=$1
 fi
 
-if [ $1=="server" ];
-	then
-		python -m SimpleHTTPServer 8000
+# start a simple test-server in the project directory
+if [ $1=="server" ]; then
+    python -m SimpleHTTPServer 8000
 fi
 
 # create the project directory
@@ -21,14 +33,14 @@ cd $project_name
 # create the default files (style.css + functions.js) and directorys
 sudo mkdir css lib js img
 sudo touch css/style.css js/functions.js
-echo "Der Projekt Ordner \"$project_name\" wurde erfolgreich erstellt"
+echo "\033[0;32mDer Projekt Ordner \"$project_name\" wurde erfolgreich erstellt\033[0m"
 
 # installation of bootstrap, modernizr, jquery
 bower install bootstrap modernizr jquery
 
 # compilation of the bootstrap stylesheets
 lessc lib/bootstrap/less/bootstrap.less > css/bootstrap.css
-echo "Bootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt"
+echo "\033[0;32mBootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt\033[0m"
 
 # customize the index.html
 cat /opt/kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', '$project_name')" > index.html
