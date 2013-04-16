@@ -73,7 +73,7 @@ echo "\033[0;32mBootstrap, Modernizr und jQuery wurden erfolgreich deinem Projek
 
 # customize the index.html
 wget https://raw.github.com/kokakolako/kokaplate/master/lib/index.html
-cat /opt/kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', '$project_name')" > index.html
+cat ~/.kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', '$project_name')" > index.html
 
 # initialize git
 git init
