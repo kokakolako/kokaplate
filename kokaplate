@@ -1,29 +1,58 @@
 #!/bin/sh
 
+# start a simple test-server in the project directory
+if [ "$1" = "server" ]; then
+    python -m SimpleHTTPServer 8000
+fi
+
 # check the dependencies
+command -v bower >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Node.js ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Bitte lade dir doch eine aktuelle Version von Node.js herunter."
+    exit 1
+}
+
+command -v less >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m LESS ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird LESS nun automatisch heruntergeladen und installiert."
+    sudo npm install -g less
+    exit 1
+}
 
 command -v bower >/dev/null && continue || {
-    echo "\033[0;31mFehlende Abhängigkeiten\033[0m: Bitte installiere dir Bower um kokaplate ausführen zu können.\nUm Bower zu installieren ist es zunächst notwendig Node.js zu installieren. Node.js lässt sich von folgender Webseite herunterladen: \"http://nodejs.org/\". Nach der Installation von Node.js lässt sich Bower mittels folgenden Befehl installieren: sudo npm install -g bower"; 
-    exit 1; 
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Bower ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Bower nun automatisch heruntergeladen und installiert."
+    sudo npm install -g bower
+    exit 1
 }
 
 command -v pyp >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Pyp ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Pyp nun automatisch heruntergeladen und installiert."
     sudo wget -O /opt/kokaplate/pyp https://pyp.googlecode.com/files/pyp_beta
     sudo ln -s /opt/kokaplate/pyp /bin/pyp
+    exit 1
 }
+
+command -v wget >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m wget ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird wget nun automatisch heruntergeladen und installiert."
+    sudo apt-get install wget
+    exit 1
+}
+
+command -v git >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m git ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird git nun automatisch heruntergeladen und installiert."
+    sudo apt-get install git
+    exit 1
+}
+
+# check if kokaplate is allready installed
+if [ ! `ls -A ~| grep .kokaplate` = ".kokaplate" ]; then
+    git clone git://github.com/kokakolako/kokaplate.git ~/.kokaplate
+fi
 
 # get the name of the project directory
 if [ -z $1 ]; then
     echo "\033[0;32mWie willst du dein neues Projekt benennen?\033[0m "
     read project_name
 else
-    project_name=$1
-fi
-
-# start a simple test-server in the project directory
-if [ $1=="server" ]; then
-    python -m SimpleHTTPServer 8000
+    project_name = $1
 fi
 
 # create the project directory
@@ -43,6 +72,7 @@ lessc lib/bootstrap/less/bootstrap.less > css/bootstrap.css
 echo "\033[0;32mBootstrap, Modernizr und jQuery wurden erfolgreich deinem Projekt hinzugefügt\033[0m"
 
 # customize the index.html
+wget https://raw.github.com/kokakolako/kokaplate/master/lib/index.html
 cat /opt/kokaplate/lib/index.html | pyp "p.replace('[[project_name]]', '$project_name')" > index.html
 
 # initialize git
