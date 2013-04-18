@@ -5,41 +5,44 @@ command -v bower >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Node.js ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Bitte lade dir doch eine aktuelle Version von Node.js herunter."
     exit 1
 }
-
 command -v less >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m LESS ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird LESS nun automatisch heruntergeladen und installiert."
     sudo npm install -g less
     exit 1
 }
-
 command -v sass >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Sass ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Sass nun automatisch heruntergeladen und installiert."
     sudo gem install sass
     exit 1
 }
-
+command -v coyote >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Coyote ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Coyote nun automatisch heruntergeladen und installiert."
+    sudo gem install coyote
+    exit 1
+}
 command -v bower >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Bower ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Bower nun automatisch heruntergeladen und installiert."
     sudo npm install -g bower
     exit 1
 }
-
 command -v pyp >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Pyp ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird Pyp nun automatisch heruntergeladen und installiert."
     sudo wget -O /opt/kokaplate/pyp https://pyp.googlecode.com/files/pyp_beta
     sudo ln -s /opt/kokaplate/pyp /bin/pyp
     exit 1
 }
-
 command -v wget >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m wget ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird wget nun automatisch heruntergeladen und installiert."
     sudo apt-get install wget
     exit 1
 }
-
 command -v git >/dev/null && continue || {
     echo "\033[0;31mFehlende Abhängigkeiten:\033[0m git ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Aus diesem Grund wird git nun automatisch heruntergeladen und installiert."
     sudo apt-get install git
+    exit 1
+}
+command -v ruby >/dev/null && continue || {
+    echo "\033[0;31mFehlende Abhängigkeiten:\033[0m Ruby ist nicht vorhanden, muss aber zum Ausführen von kokaplate installiert sein. Bitte lade dir doch eine aktuelle Version von Ruby herunter."
     exit 1
 }
 
@@ -49,7 +52,7 @@ if [ "$(ls -A ~| grep .kokaplate)" != ".kokaplate" ]; then
     git clone git://github.com/kokakolako/kokaplate.git ~/.kokaplate
 fi
 
-#get the project directory path
+# get the project directory path
 project_directory = `pwd`
 
 # start a simple test-server in the project directory
@@ -62,7 +65,20 @@ if [ "$1" = "install" ]; then
     bower install $2
 fi
 
-#build the project
+# watch the files for changes
+if [ "$1" = "watch" ]; then
+    if [ "$(ls | grep sass)" =  "sass"]; then  # detect if sass is used
+        if [ -n "$(ls sass/ | grep .scss)" ]; then
+            sass --watch sass/style.scss:style.css
+        elif [ -n "$(ls sass/ | grep .sass)" ]; then
+            sass --watch sass/style.sass:style.css
+        fi
+    elif [ "$(ls | grep less)" =  "less"]; then # detect if less is used
+        coyote --watch less/style.less:style.css
+    fi
+fi
+
+# build the project
 if [ "$1" = "build" ]; then
     if [ "$(ls | grep sass)" =  "sass"]; then  # detect if sass is used
         if [ -n "$(ls sass/ | grep .scss)" ]; then
@@ -70,7 +86,7 @@ if [ "$1" = "build" ]; then
         elif [ -n "$(ls sass/ | grep .sass)" ]; then
             sass sass/style.sass:style.css
         fi
-    elif [ "$(ls | grep less)" =  "less"]; then # detect if less is used        
+    elif [ "$(ls | grep less)" =  "less"]; then # detect if less is used
         lessc less/style.less > style.css
     fi
 fi
